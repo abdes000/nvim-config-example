@@ -32,7 +32,9 @@ require("lazy").setup({
   ui = {
     border = "rounded",
   },
-  -- import your plugins
-  -- { import = "core" },
-  -- import = "plugins"    -- this will recursively load lua/plugins/**/*,
-}, "plugins")
+  spec = {
+    -- import your plugins
+    -- { import = "core" },
+    { import = "plugins" }, -- this will recursively load lua/plugins/**/*
+  },
+})

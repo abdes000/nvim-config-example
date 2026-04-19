@@ -21,20 +21,21 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
 -- Setup lazy.nvim
-require("lazy").setup({
-  defaults = {
-    lazy = true, -- load plugins lazily by default
-  },
-  install = {
-    colorscheme = { "tokyonight", "gruvbox" },
-  },
-  checker = { enabled = true },
-  ui = {
-    border = "rounded",
-  },
-  spec = {
-    -- import your plugins
-    -- { import = "core" },
-    { import = "plugins" }, -- this will recursively load lua/plugins/**/*
-  },
-})
+-- require("lazy").setup({
+--   defaults = {
+--     lazy = true, -- load plugins lazily by default
+--   },
+--   install = {
+--     colorscheme = { "tokyonight", "gruvbox" },
+--   },
+--   checker = { enabled = true },
+--   ui = {
+--     border = "rounded",
+--   },
+--   spec = {
+--     -- import your plugins
+--     -- { import = "core" },
+--     { import = "plugins" }, -- this will recursively load lua/plugins/**/*
+--   },
+-- })
+require("lazy").setup("plugins")

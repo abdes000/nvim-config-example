@@ -34,6 +34,5 @@ require("lazy").setup({
   },
   -- import your plugins
   -- { import = "core" },
-  import = "plugins"    -- this will recursively load lua/plugins/**/*
-  ,
-})
+  -- import = "plugins"    -- this will recursively load lua/plugins/**/*,
+}, "plugins")

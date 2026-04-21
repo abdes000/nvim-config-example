@@ -10,22 +10,22 @@ return {
             "hrsh7th/cmp-cmdline",
 
             -- Snippets
-            "crazyhulk/cmp-sign",
+            -- "crazyhulk/cmp-sign", -- DEPRECATED: Unmaintained, limited functionality
             "saadparwaiz1/cmp_luasnip",
             "L3MON4D3/cmp-luasnip-choice",
-            "abeldekat/cmp-mini-snippets",
-            "xzbdmw/cmp-mini-snippets",
-            "notomo/cmp-neosnippet",
-            "dcampos/cmp-snippy",
-            "quangnguyen30192/cmp-nvim-ultisnips",
+            -- "abeldekat/cmp-mini-snippets", -- DEPRECATED: Use native mini.snippets support
+            -- "xzbdmw/cmp-mini-snippets", -- DEPRECATED: Use native mini.snippets support
+            -- "notomo/cmp-neosnippet", -- DEPRECATED: NeoSnippet is outdated
+            -- "dcampos/cmp-snippy", -- DEPRECATED: Not actively maintained
+            -- "quangnguyen30192/cmp-nvim-ultisnips", -- DEPRECATED: UltiSnips ecosystem is obsolete
             "hrsh7th/cmp-vsnip",
-            "kento-ogata/cmp-tsnip",
+            -- "kento-ogata/cmp-tsnip", -- DEPRECATED: TSnip is unmaintained
 
             -- Buffer / Vim builtins
             "rasulomaroff/cmp-bufname",
             "amarakon/nvim-cmp-buffer-lines",
             "hrsh7th/cmp-calc",
-            "PhilRunninger/cmp-rpncalc",
+            -- "PhilRunninger/cmp-rpncalc", -- DEPRECATED: Not actively maintained
             "uga-rosa/cmp-dictionary",
             "dmitmel/cmp-digraphs",
             "hrsh7th/cmp-omni",
@@ -40,7 +40,7 @@ return {
             "samiulsami/cmp-go-deep",
 
             -- Paths
-            "cmp-async-path",
+            -- "cmp-async-path", -- TODO: Fix incomplete plugin spec - needs owner/repo format
 
             -- Git
             "petertriho/cmp-git",
@@ -72,9 +72,9 @@ return {
             "Arkissa/cmp-agda-symbols",
 
             -- AI
-            "tzachar/cmp-ai",
-            "vappolinario/cmp-clippy",
-            { "tzachar/cmp-tabnine", build = './install.sh', },
+            -- "tzachar/cmp-ai", -- DEPRECATED: No longer maintained
+            -- "vappolinario/cmp-clippy", -- DEPRECATED: Abandoned project
+            -- { "tzachar/cmp-tabnine", build = './install.sh', }, -- DEPRECATED: Use copilot-cmp or codeium instead
             "hrsh7th/cmp-copilot",
             {
                 "zbirenbaum/copilot-cmp",
@@ -82,8 +82,8 @@ return {
                 fix_pairs = true,
             },
             "Exafunction/codeium.nvim",
-            "sourcegraph/sg.nvim",
-            "luozhiya/fittencode.nvim",
+            -- "sourcegraph/sg.nvim", -- DEPRECATED: Sourcegraph integration is less maintained
+            -- "luozhiya/fittencode.nvim", -- DEPRECATED: Less active project
             "supermaven-inc/supermaven-nvim",
             "milanglacier/minuet-ai.nvim",
 
@@ -93,7 +93,7 @@ return {
             "garyhurtz/cmp_bulma.nvim",
             "amarakon/nvim-cmp-fonts",
             "Jezda1337/nvim-html-css",
-            "cmp-scss",
+            -- "cmp-scss", -- TODO: Fix incomplete plugin spec - needs owner/repo format
             "pontusk/cmp-sass-variables",
             "roginfarrer/cmp-css-variables",
 
@@ -115,8 +115,8 @@ return {
             "Praczet/yaml-tags",
 
             -- Rails
-            "wassimk/cmp-rails-fixture-names",
-            "wassimk/cmp-rails-fixture-types",
+            -- "wassimk/cmp-rails-fixture-names", -- DEPRECATED: Not maintained
+            -- "wassimk/cmp-rails-fixture-types", -- DEPRECATED: Not maintained
         },
         opts = {},
         config = function()
@@ -294,7 +294,7 @@ return {
                     { name = "cmp-tsnip" },
                     { name = "buffer" },
                     { name = "path" },
-                    { name = "async_path" },
+                    -- { name = "async_path" }, -- TODO: Plugin spec is incomplete
                     { name = "git" },
                     { name = "conventionalcommits" },
                     { name = "commit" },
@@ -459,7 +459,7 @@ return {
                     { name = "bulma" },
                     { name = "fonts" },
                     { name = "nvim-html-css" },
-                    { name = "cmp-scss" },
+                    -- { name = "cmp-scss" }, -- TODO: Plugin spec is incomplete
                     { name = "cmp-sass-variables" },
                     { name = "cmp-css-variables" },
                     { name = "crates" },
@@ -511,7 +511,7 @@ return {
                             },
                         },
                     },
-                    { name = "async_path" },
+                    -- { name = "async_path" }, -- TODO: Plugin spec is incomplete
                 }, {
                     { name = "cmdline" },
                     { name = "cmp-cmdline-history" },
@@ -522,21 +522,31 @@ return {
 
 
 
-            require('cmp_sign').setup({
-                good = "xxx{{name}}xxxx{{sign}}",
-            })
+            do
+                local ok, cmp_sign = pcall(require, 'cmp_sign')
+                if ok and cmp_sign and cmp_sign.setup then
+                    cmp_sign.setup({
+                        good = "xxx{{name}}xxxx{{sign}}",
+                    })
+                end
+            end
 
             require('cmp_luasnip_choice').setup({
                 auto_open = true, -- Automatically open nvim-cmp on choice node (default: true)
             });
 
-            require("cmp_nvim_ultisnips").setup {
-                filetype_source = "ultisnips_default",
-                show_snippets = "all",
-                documentation = function(snippet)
-                    return snippet.description .. "\n\n" .. snippet.value
+            do
+                local ok, ult = pcall(require, "cmp_nvim_ultisnips")
+                if ok and ult and ult.setup then
+                    ult.setup {
+                        filetype_source = "ultisnips_default",
+                        show_snippets = "all",
+                        documentation = function(snippet)
+                            return snippet.description .. "\n\n" .. snippet.value
+                        end
+                    }
                 end
-            }
+            end
 
             require("cmp_dictionary").setup({
                 paths = { "/usr/share/dict/words" },
@@ -691,47 +701,56 @@ return {
                 },
             }
 
-            local cmp_ai = require('cmp_ai.config')
+            do
+                local ok_cmp_ai, cmp_ai = pcall(require, 'cmp_ai.config')
+                if ok_cmp_ai and cmp_ai and cmp_ai.setup then
+                    cmp_ai:setup({
+                        max_lines = 1000,
+                        provider = 'OpenAI',
+                        provider_options = {
+                            model = 'gpt-4',
+                        },
+                        log_errors = true,
+                        max_timeout_seconds = 8,
+                        html = true,
+                        notify = true,
+                        notify_callback = function(msg)
+                            vim.notify(msg)
+                        end,
+                        run_on_every_keystroke = true,
+                        ignored_file_types = {
+                            -- default is not to ignore
+                            -- uncomment to ignore in lua:
+                            -- lua = true
+                        },
+                    })
+                end
+            end
 
-            cmp_ai:setup({
-                max_lines = 1000,
-                provider = 'OpenAI',
-                provider_options = {
-                    model = 'gpt-4',
-                },
-                log_errors = true,
-                max_timeout_seconds = 8,
-                html = true,
-                notify = true,
-                notify_callback = function(msg)
-                    vim.notify(msg)
-                end,
-                run_on_every_keystroke = true,
-                ignored_file_types = {
-                    -- default is not to ignore
-                    -- uncomment to ignore in lua:
-                    -- lua = true
-                },
-            })
 
-
-            local tabnine = require('cmp_tabnine.config')
-
-            tabnine:setup({
-                max_lines = 1000,
-                max_num_results = 20,
-                sort = true,
-                run_on_every_keystroke = true,
-                snippet_placeholder = '..',
-                ignored_file_types = {
-                    -- default is not to ignore
-                    -- uncomment to ignore in lua:
-                    -- lua = true
-                },
-                show_prediction_strength = false,
-                min_percent = 0
-            })
-            require('cmp_tabnine'):prefetch(file_path)
+            do
+                local ok_tabnine, tabnine = pcall(require, 'cmp_tabnine.config')
+                if ok_tabnine and tabnine and tabnine.setup then
+                    tabnine:setup({
+                        max_lines = 1000,
+                        max_num_results = 20,
+                        sort = true,
+                        run_on_every_keystroke = true,
+                        snippet_placeholder = '..',
+                        ignored_file_types = {
+                            -- default is not to ignore
+                            -- uncomment to ignore in lua:
+                            -- lua = true
+                        },
+                        show_prediction_strength = false,
+                        min_percent = 0
+                    })
+                    local ok_tab_mod, tab_mod = pcall(require, 'cmp_tabnine')
+                    if ok_tab_mod and tab_mod and tab_mod.prefetch then
+                        pcall(tab_mod.prefetch, file_path)
+                    end
+                end
+            end
 
             require("copilot").setup({
                 suggestion = { enabled = false },

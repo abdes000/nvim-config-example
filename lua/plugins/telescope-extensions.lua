@@ -78,12 +78,12 @@ return {
         "nvim-telescope/telescope-cscope.nvim",
         "nvim-telescope/telescope-vimspector.nvim",
         "nvim-telescope/telescope-dap.nvim",
-        "nvim-telescope/telescope-dapzzzz",
+        -- "nvim-telescope/telescope-dapzzzz", -- INVALID: typo/unknown, commented out
         "nvim-telescope/telescope-packer.nvim",
         "nvim-telescope/telescope-asynctasks.nvim",
         "nvim-telescope/telescope-ultisnips.nvim",
         "nvim-telescope/telescope-coc.nvim",
-        "nvim-telescope/telescope-resession.nvim",
+        -- "nvim-telescope/telescope-resession.nvim", -- INVALID: likely misspelled 'resession', commented out
         "nvim-telescope/telescope-gpt.nvim",
         "nvim-telescope/telescope-cmdline.nvim",
         "nvim-telescope/telescope-cmdline-word.nvim",
@@ -137,8 +137,10 @@ return {
             "zotero", "foldmarkers", "jj", "live_grep_args", "rg", "hierarchy", "github",
             "ghq", "repo", "node_modules", "z", "tmuxinator", "hop", "docker", "docker_commands",
             "openbrowser", "vim_bookmarks", "tmux", "zoxide", "luasnip", "lazy", "lazy_plugins",
-            "cscope", "vimspector", "dap", "dapzzzz", "packer", "asynctasks", "ultisnips", "coc",
-            "resession", "gpt", "cmdline", "cmdline_word", "everything", "extension_maker",
+            "cscope", "vimspector", "dap", -- "dapzzzz", -- INVALID: commented out
+            "packer", "asynctasks", "ultisnips", "coc",
+            -- "resession", -- INVALID: commented out
+            "gpt", "cmdline", "cmdline_word", "everything", "extension_maker",
             "alternate", "search_dir_picker", "directory", "dir_telescope", "monorepos",
             "filelinks", "import", "picker_list", "cache", "find_exe", "changes", "scriptnames",
             "messages", "helpgrep", "manix", "opds"
@@ -282,11 +284,11 @@ return {
         map("n", "<leader>gp", ":Telescope packer<CR>", { desc = "Packer plugins" })
         map("n", "<leader>ga", ":Telescope asynctasks<CR>", { desc = "Async tasks" })
         map("n", "<leader>gcoc", ":Telescope coc<CR>", { desc = "Coc.nvim integration" })
-        map("n", "<leader>grs", ":Telescope resession<CR>", { desc = "Resession sessions" })
+        -- map("n", "<leader>grs", ":Telescope resession<CR>", { desc = "Resession sessions" }) -- commented out: invalid extension
         map("n", "<leader>ggpt", ":Telescope gpt<CR>", { desc = "ChatGPT integration" })
         map("n", "<leader>gcs", ":Telescope cscope<CR>", { desc = "Cscope picker" })
         map("n", "<leader>gdap", ":Telescope dap<CR>", { desc = "DAP integration" })
-        map("n", "<leader>gdzz", ":Telescope dapzzzz<CR>", { desc = "DAP configs" })
+        -- map("n", "<leader>gdzz", ":Telescope dapzzzz<CR>", { desc = "DAP configs" }) -- commented out: invalid extension
         map("n", "<leader>gv", ":Telescope vimspector<CR>", { desc = "Vimspector integration" })
         map("n", "<leader>glz", ":Telescope lazy<CR>", { desc = "Lazy plugins" })
         map("n", "<leader>glp", ":Telescope lazy_plugins<CR>", { desc = "Lazy plugin configs" })

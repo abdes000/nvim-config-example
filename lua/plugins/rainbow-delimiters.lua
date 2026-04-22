@@ -1,5 +1,5 @@
 return {
-    "rainbow-delimiters.nvim",
+    "HiPhish/rainbow-delimiters.nvim",
     config = function()
         ---@type rainbow_delimiters.config
         vim.g.rainbow_delimiters = {

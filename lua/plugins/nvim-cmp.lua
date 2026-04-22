@@ -253,28 +253,12 @@ return {
                     ["<C-Space>"] = cmp.mapping.complete(),
                     ["<C-e>"] = cmp.mapping.abort(),
                     ["<CR>"] = cmp.mapping.confirm({ select = true }),
-                    ["<Tab>"] = cmp.mapping(
-                        function(fallback)
-                            cmp_ultisnips_mappings.expand_or_jump_forwards(fallback)
-                        end,
-                        { "i", "s", --[[ "c" (to enable the mapping in command mode) ]] }
-                    ),
-                    ["<S-Tab>"] = cmp.mapping(
-                        function(fallback)
-                            cmp_ultisnips_mappings.jump_backwards(fallback)
-                        end,
-                        { "i", "s", --[[ "c" (to enable the mapping in command mode) ]] }
-                    ),
-                    ['<C-x>'] = cmp.mapping(
-                        cmp.mapping.complete({
-                            config = {
-                                sources = cmp.config.sources({
-                                    { name = 'cmp_ai' },
-                                }),
-                            },
-                        }),
-                        { 'i' }
-                    ),
+                    ["<Tab>"] = cmp.mapping(function(fallback)
+                        fallback()
+                    end, { "i", "s" }),
+                    ["<S-Tab>"] = cmp.mapping(function(fallback)
+                        fallback()
+                    end, { "i", "s" }),
                 }),
                 sources = cmp.config.sources({
                     { name = 'path' },
@@ -284,18 +268,8 @@ return {
                     { name = 'omni' },
                     { name = 'color_names' },
                     { name = "nvim_lsp" },
-                    { name = "vsnip" }, -- or luasnip/snippy/ultisnips/mini.snippets
-                    { name = "cmp-sign" },
+                    { name = "vsnip" },
                     { name = "cmp-luasnip-choice" },
-                    { name = "cmp-mini-snippets" },
-                    { name = "cmp-neosnippet" },
-                    { name = "cmp-snippy" },
-                    { name = "cmp-nvim-ultisnips" },
-                    { name = "cmp-tsnip" },
-                    { name = "buffer" },
-                    { name = "path" },
-                    -- { name = "async_path" }, -- TODO: Plugin spec is incomplete
-                    { name = "git" },
                     { name = "conventionalcommits" },
                     { name = "commit" },
                     { name = "gitmoji" },
@@ -312,8 +286,6 @@ return {
                     { name = "agda-symbols" },
                     { name = "dictionary" },
                     { name = "spell" },
-                    { name = "calc" },
-                    { name = "rpncalc" },
                     { name = "fuzzy_buffer" },
                     { name = "fuzzy_path" },
                     { name = "rg" },
@@ -321,145 +293,32 @@ return {
                     {
                         name = "kitty",
                         option = {
-
-                            -- cmp configuration
                             trigger_characters = {},
-                            trigger_characters_ft = {},
                             keyword_pattern = [[\w\+]],
-
-                            -- what information to collect
-
-                            --- words
-                            match_words = true,
-                            match_upper_case = false,
-                            match_lower_case = false,
-                            match_capitalized = false,
-                            match_alphanumerics = true,
-                            match_camel_case = true,
-                            match_kebab_case = true,
-                            match_snake_case = true,
-                            match_dot_case = true,
-                            match_words_with_punctuation = true,
-
-                            --- numbers
-                            match_integers = true,
-                            match_floats = true,
-                            match_hex_strings = true,
-                            match_binary_strings = true,
-
-                            --- computing
-                            match_emails = true,
-                            match_ip_addrs = true,
-                            match_uuids = true,
-                            match_aws_unique_id = false,
-
-                            --- paths
-                            match_urls = { "https?" },
-                            match_directories = true,
-                            match_files = true,
-                            match_files_by_suffix = {},
-                            match_hidden_files = true,
-
-                            -- window matching configuration
-                            os_window = {
-
-                                include_focused = true,
-                                include_unfocused = true,
-
-                                include_active = true,
-                                include_inactive = true,
-
-                                tab = {
-
-                                    include_active = true,
-                                    include_inactive = true,
-
-                                    include_title = function() end,
-                                    exclude_title = function() end,
-
-                                    window = {
-
-                                        include_focused = true,
-                                        include_unfocused = true,
-
-                                        include_active = true,
-                                        include_inactive = true,
-
-                                        include_title = function() end,
-                                        exclude_title = function() end,
-
-                                        include_cwd = function() end,
-                                        exclude_cwd = function() end,
-
-                                        include_env = function() end,
-                                        exclude_env = function() end,
-
-                                        include_foreground_process = function() end,
-                                        exclude_foreground_process = function() end,
-                                    },
-                                },
-                            },
-
-                            extent = "all",
-
-                            strict_matching = true,
-
-                            -- Timing configuration
-                            window_polling_period = 100,      -- in msec
-                            completion_min_update_period = 5, -- in seconds
-                            completion_item_lifetime = 60,    -- in seconds
                         }
                     },
                     { name = "nushell" },
                     {
                         name = "tmux",
                         option = {
-                            -- Source from all panes in session instead of adjacent panes
                             all_panes = false,
-
-                            -- Completion popup label
                             label = '[tmux]',
-
-                            -- Trigger character
                             trigger_characters = { '.' },
-
-                            -- Specify trigger characters for filetype(s)
-                            -- { filetype = { '.' } }
                             trigger_characters_ft = {},
-
-                            -- Keyword patch mattern
                             keyword_pattern = [[\w\+]],
-
-                            -- Capture full pane history
-                            -- `false`: show completion suggestion from text in the visible pane (default)
-                            -- `true`: show completion suggestion from text starting from the beginning of the pane history.
-                            --         This works by passing `-S -` flag to `tmux capture-pane` command. See `man tmux` for details.
                             capture_history = false,
                         }
                     },
                     { name = "zsh" },
-                    { name = "cmp-ai" },
-                    {
-                        name = "cmp-clippy",
-                        options = {
-                            model = "EleutherAI/gpt-neo-2.7B", -- check code clippy vscode repo for options
-                            key = "",                          -- huggingface.co api key
-                        }
-                    },
-                    { name = "cmp-tabnine" },
                     { name = "copilot" },
                     { name = "copilot_cmp" },
                     { name = "codeium" },
-                    { name = "sg" },
-                    { name = "fittencode" },
                     { name = "supermaven" },
                     { name = "minuet-ai" },
                     { name = "tw2css" },
-                    { name = "color_names" },
                     { name = "bulma" },
                     { name = "fonts" },
                     { name = "nvim-html-css" },
-                    -- { name = "cmp-scss" }, -- TODO: Plugin spec is incomplete
                     { name = "cmp-sass-variables" },
                     { name = "cmp-css-variables" },
                     { name = "crates" },
@@ -474,12 +333,8 @@ return {
                     { name = "cmp-pandoc-references" },
                     { name = "cmp-pandoc" },
                     { name = "yaml-tags" },
-                    { name = "rails-fixture-names" },
-                    { name = "rails-fixture-types" },
                     {
                         name = "diag-codes",
-                        -- default completion available only in comment context
-                        -- use false if you want to get in other context
                         option = { in_comment = true }
                     },
                 }),

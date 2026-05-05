@@ -1,8 +1,14 @@
 return {
   "onsails/lspkind.nvim",
   config = function()
+    -- Guard with pcall since lspkind is optional
+    local ok_lsk, lspkind = pcall(require, 'lspkind')
+    if not ok_lsk or not lspkind then
+      return
+    end
+
     -- setup() is also available as an alias
-    require('lspkind').init({
+    lspkind.init({
       -- defines how annotations are shown
       -- default: symbol
       -- options: 'text', 'text_symbol', 'symbol_text', 'symbol'
@@ -62,10 +68,10 @@ return {
               -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
               -- can also be a function to dynamically calculate max width such as
               -- menu = function() return math.floor(0.45 * vim.o.columns) end,
-              menu = 50,            -- leading text (labelDetails)
-              abbr = 50,            -- actual suggestion item
+              menu = 50,              -- leading text (labelDetails)
+              abbr = 50,              -- actual suggestion item
             },
-            ellipsis_char = '...',  -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
+            ellipsis_char = '...',    -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
             show_labelDetails = true, -- show labelDetails in menu. Disabled by default
 
             -- The function below will be called before any actual modifications from lspkind

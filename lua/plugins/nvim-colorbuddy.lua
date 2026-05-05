@@ -2,12 +2,16 @@ return -- Lua
 {
     "tjdevries/colorbuddy.nvim",
     config = function()
+        -- Guard with pcall since colorbuddy is optional
+        local ok_cb, colorbuddy = pcall(require, 'colorbuddy')
+        if not ok_cb or not colorbuddy then
+            return
+        end
+
         -- file: colors/my-colorscheme-name.lua
 
-        local colorbuddy = require('colorbuddy')
-
         -- Set up your custom colorscheme if you want
-        colorbuddy.colorscheme("my-colorscheme-name")
+        local ok_scheme = pcall(function() colorbuddy.colorscheme("my-colorscheme-name") end)
 
         -- And then modify as you like
         local Color = colorbuddy.Color

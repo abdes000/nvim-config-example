@@ -1,7 +1,13 @@
 return {
     'nvim-java/nvim-java',
     config = function()
-        require('java').setup({
+        -- Guard with pcall since nvim-java is optional
+        local ok_java, java = pcall(require, 'java')
+        if not ok_java or not java then
+            return
+        end
+
+        java.setup({
             -- Startup checks
             checks = {
                 nvim_version = true,        -- Check Neovim version

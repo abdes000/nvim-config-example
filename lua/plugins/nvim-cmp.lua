@@ -229,14 +229,14 @@ return {
                     { name = 'color_names' },
                     { name = "nvim_lsp" },
                     { name = "vsnip" },
-                    { name = "luasnip_choice" },    -- cmp-luasnip-choice registers as 'luasnip_choice'
+                    { name = "luasnip_choice" }, -- cmp-luasnip-choice registers as 'luasnip_choice'
                     { name = "conventionalcommits" },
                     { name = "commit" },
                     { name = "gitmoji" },
                     { name = "emoji" },
                     { name = "nerdfont" },
                     { name = "greek" },
-                    { name = 'ecolog' },
+                    -- { name = 'ecolog' }, -- ecolog plugin has its own completion, cmp integration optional
                     {
                         name = "latex_symbols",
                         option = {
@@ -279,20 +279,20 @@ return {
                     { name = "bulma" },
                     { name = "fonts" },
                     { name = "nvim-html-css" },
-                    { name = "cmp-sass-variables" },
-                    { name = "cmp-css-variables" },
+                    { name = "sass_variables" }, -- corrected from cmp-sass-variables
+                    { name = "css_variables" },  -- corrected from cmp-css-variables
                     { name = "crates" },
                     { name = "npm" },
                     { name = "pypi" },
-                    { name = "cmp-go-pkgs" },
+                    -- { name = "cmp-go-pkgs" }, -- commented out due to conflicting plugins (Snikimonkd/cmp-go-pkgs vs Yu-Leo/cmp-go-pkgs)
                     { name = "buck-vim-plugin" },
-                    { name = "cmp-vimtex" },
+                    { name = "vimtex" },            -- cmp-vimtex registers as 'vimtex'
                     { name = "orgmode" },
-                    { name = "cmp-vimwiki-tags" },
+                    { name = "vimwiki_tags" },      -- cmp-vimwiki-tags registers as 'vimwiki_tags'
                     { name = "obsidian" },
-                    { name = "cmp-pandoc-references" },
-                    { name = "cmp-pandoc" },
-                    { name = "yaml-tags" },
+                    { name = "pandoc_references" }, -- cmp-pandoc-references registers as 'pandoc_references'
+                    { name = "pandoc" },            -- cmp-pandoc registers as 'pandoc'
+                    { name = "yaml_tags" },         -- yaml-tags registers as 'yaml_tags'
                     {
                         name = "diag-codes",
                         option = { in_comment = true }
@@ -324,22 +324,23 @@ return {
                     -- { name = "async_path" }, -- TODO: Plugin spec is incomplete
                 }, {
                     { name = "cmdline" },
-                    { name = "cmp-cmdline-history" },
-                    { name = "cmp-cmdline-prompt" },
+                    { name = "cmdline_history" }, -- cmp-cmdline-history registers as 'cmdline_history'
+                    -- { name = "cmdline_prompt" }, -- cmp-cmdline-prompt may not register as cmp source, commented as optional
                 }),
                 matching = { disallow_symbol_nonprefix_matching = false },
             })
 
 
 
-            do
-                local ok, cmp_sign = pcall(require, 'cmp_sign')
-                if ok and cmp_sign and cmp_sign.setup then
-                    cmp_sign.setup({
-                        good = "xxx{{name}}xxxx{{sign}}",
-                    })
-                end
-            end
+            -- DEPRECATED: cmp_sign is no longer maintained; prefer luasnip or vsnip
+            -- do
+            --     local ok, cmp_sign = pcall(require, 'cmp_sign')
+            --     if ok and cmp_sign and cmp_sign.setup then
+            --         cmp_sign.setup({
+            --             good = "xxx{{name}}xxxx{{sign}}",
+            --         })
+            --     end
+            -- end
 
             do
                 local ok_lc, cmp_lc = pcall(require, 'cmp_luasnip_choice')
@@ -350,18 +351,19 @@ return {
                 end
             end
 
-            do
-                local ok, ult = pcall(require, "cmp_nvim_ultisnips")
-                if ok and ult and ult.setup then
-                    ult.setup {
-                        filetype_source = "ultisnips_default",
-                        show_snippets = "all",
-                        documentation = function(snippet)
-                            return snippet.description .. "\n\n" .. snippet.value
-                        end
-                    }
-                end
-            end
+            -- DEPRECATED: UltiSnips ecosystem is obsolete; use luasnip + telescope-luasnip.nvim
+            -- do
+            --     local ok, ult = pcall(require, "cmp_nvim_ultisnips")
+            --     if ok and ult and ult.setup then
+            --         ult.setup {
+            --             filetype_source = "ultisnips_default",
+            --             show_snippets = "all",
+            --             documentation = function(snippet)
+            --                 return snippet.description .. "\n\n" .. snippet.value
+            --             end
+            --         }
+            --     end
+            -- end
 
             do
                 local ok_dict, cmp_dictionary = pcall(require, "cmp_dictionary")
@@ -375,206 +377,239 @@ return {
 
 
             do
-            local ok_git_fmt, format = pcall(require, "cmp_git.format")
-            local ok_git_srt, sort   = pcall(require, "cmp_git.sort")
-            local ok_cmp_git, cmp_git = pcall(require, "cmp_git")
-            if ok_git_fmt and ok_git_srt and ok_cmp_git and cmp_git.setup then
-            cmp_git.setup({
-                -- defaults
-                filetypes = { "gitcommit", "octo", "NeogitCommitMessage" },
-                remotes = { "upstream", "origin" }, -- in order of most to least prioritized
-                enableRemoteUrlRewrites = false,    -- enable git url rewrites, see https://git-scm.com/docs/git-config#Documentation/git-config.txt-urlltbasegtinsteadOf
-                git = {
-                    commits = {
-                        limit = 100,
-                        sort_by = sort.git.commits,
-                        format = format.git.commits,
-                        sha_length = 7,
-                    },
-                },
-                github = {
-                    hosts = {}, -- list of private instances of github
-                    issues = {
-                        fields = { "title", "number", "body", "updatedAt", "state" },
-                        filter = "all", -- assigned, created, mentioned, subscribed, all, repos
-                        limit = 100,
-                        state = "open", -- open, closed, all
-                        sort_by = sort.github.issues,
-                        format = format.github.issues,
-                    },
-                    mentions = {
-                        limit = 100,
-                        sort_by = sort.github.mentions,
-                        format = format.github.mentions,
-                    },
-                    pull_requests = {
-                        fields = { "title", "number", "body", "updatedAt", "state" },
-                        limit = 100,
-                        state = "open", -- open, closed, merged, all
-                        sort_by = sort.github.pull_requests,
-                        format = format.github.pull_requests,
-                    },
-                },
-                gitlab = {
-                    hosts = {}, -- list of private instances of gitlab
-                    issues = {
-                        limit = 100,
-                        state = "opened", -- opened, closed, all
-                        sort_by = sort.gitlab.issues,
-                        format = format.gitlab.issues,
-                    },
-                    mentions = {
-                        limit = 100,
-                        sort_by = sort.gitlab.mentions,
-                        format = format.gitlab.mentions,
-                    },
-                    merge_requests = {
-                        limit = 100,
-                        state = "opened", -- opened, closed, locked, merged
-                        sort_by = sort.gitlab.merge_requests,
-                        format = format.gitlab.merge_requests,
-                    },
-                },
-                trigger_actions = {
-                    {
-                        debug_name = "git_commits",
-                        trigger_character = ":",
-                        action = function(sources, trigger_char, callback, params, git_info)
-                            return sources.git:get_commits(callback, params, trigger_char)
-                        end,
-                    },
-                    {
-                        debug_name = "gitlab_issues",
-                        trigger_character = "#",
-                        action = function(sources, trigger_char, callback, params, git_info)
-                            return sources.gitlab:get_issues(callback, git_info, trigger_char)
-                        end,
-                    },
-                    {
-                        debug_name = "gitlab_mentions",
-                        trigger_character = "@",
-                        action = function(sources, trigger_char, callback, params, git_info)
-                            return sources.gitlab:get_mentions(callback, git_info, trigger_char)
-                        end,
-                    },
-                    {
-                        debug_name = "gitlab_mrs",
-                        trigger_character = "!",
-                        action = function(sources, trigger_char, callback, params, git_info)
-                            return sources.gitlab:get_merge_requests(callback, git_info, trigger_char)
-                        end,
-                    },
-                    {
-                        debug_name = "github_issues_and_pr",
-                        trigger_character = "#",
-                        action = function(sources, trigger_char, callback, params, git_info)
-                            return sources.github:get_issues_and_prs(callback, git_info, trigger_char)
-                        end,
-                    },
-                    {
-                        debug_name = "github_mentions",
-                        trigger_character = "@",
-                        action = function(sources, trigger_char, callback, params, git_info)
-                            return sources.github:get_mentions(callback, git_info, trigger_char)
-                        end,
-                    },
-                },
-            }
-            )
-            end -- if ok_git_fmt and ok_git_srt and ok_cmp_git
-            end -- do
+                local ok_git_fmt, format  = pcall(require, "cmp_git.format")
+                local ok_git_srt, sort    = pcall(require, "cmp_git.sort")
+                local ok_cmp_git, cmp_git = pcall(require, "cmp_git")
+                if ok_git_fmt and ok_git_srt and ok_cmp_git and cmp_git.setup then
+                    cmp_git.setup({
+                        -- defaults
+                        filetypes = { "gitcommit", "octo", "NeogitCommitMessage" },
+                        remotes = { "upstream", "origin" }, -- in order of most to least prioritized
+                        enableRemoteUrlRewrites = false,    -- enable git url rewrites, see https://git-scm.com/docs/git-config#Documentation/git-config.txt-urlltbasegtinsteadOf
+                        git = {
+                            commits = {
+                                limit = 100,
+                                sort_by = sort.git.commits,
+                                format = format.git.commits,
+                                sha_length = 7,
+                            },
+                        },
+                        github = {
+                            hosts = {}, -- list of private instances of github
+                            issues = {
+                                fields = { "title", "number", "body", "updatedAt", "state" },
+                                filter = "all", -- assigned, created, mentioned, subscribed, all, repos
+                                limit = 100,
+                                state = "open", -- open, closed, all
+                                sort_by = sort.github.issues,
+                                format = format.github.issues,
+                            },
+                            mentions = {
+                                limit = 100,
+                                sort_by = sort.github.mentions,
+                                format = format.github.mentions,
+                            },
+                            pull_requests = {
+                                fields = { "title", "number", "body", "updatedAt", "state" },
+                                limit = 100,
+                                state = "open", -- open, closed, merged, all
+                                sort_by = sort.github.pull_requests,
+                                format = format.github.pull_requests,
+                            },
+                        },
+                        gitlab = {
+                            hosts = {}, -- list of private instances of gitlab
+                            issues = {
+                                limit = 100,
+                                state = "opened", -- opened, closed, all
+                                sort_by = sort.gitlab.issues,
+                                format = format.gitlab.issues,
+                            },
+                            mentions = {
+                                limit = 100,
+                                sort_by = sort.gitlab.mentions,
+                                format = format.gitlab.mentions,
+                            },
+                            merge_requests = {
+                                limit = 100,
+                                state = "opened", -- opened, closed, locked, merged
+                                sort_by = sort.gitlab.merge_requests,
+                                format = format.gitlab.merge_requests,
+                            },
+                        },
+                        trigger_actions = {
+                            {
+                                debug_name = "git_commits",
+                                trigger_character = ":",
+                                action = function(sources, trigger_char, callback, params, git_info)
+                                    return sources.git:get_commits(callback, params, trigger_char)
+                                end,
+                            },
+                            {
+                                debug_name = "gitlab_issues",
+                                trigger_character = "#",
+                                action = function(sources, trigger_char, callback, params, git_info)
+                                    return sources.gitlab:get_issues(callback, git_info, trigger_char)
+                                end,
+                            },
+                            {
+                                debug_name = "gitlab_mentions",
+                                trigger_character = "@",
+                                action = function(sources, trigger_char, callback, params, git_info)
+                                    return sources.gitlab:get_mentions(callback, git_info, trigger_char)
+                                end,
+                            },
+                            {
+                                debug_name = "gitlab_mrs",
+                                trigger_character = "!",
+                                action = function(sources, trigger_char, callback, params, git_info)
+                                    return sources.gitlab:get_merge_requests(callback, git_info, trigger_char)
+                                end,
+                            },
+                            {
+                                debug_name = "github_issues_and_pr",
+                                trigger_character = "#",
+                                action = function(sources, trigger_char, callback, params, git_info)
+                                    return sources.github:get_issues_and_prs(callback, git_info, trigger_char)
+                                end,
+                            },
+                            {
+                                debug_name = "github_mentions",
+                                trigger_character = "@",
+                                action = function(sources, trigger_char, callback, params, git_info)
+                                    return sources.github:get_mentions(callback, git_info, trigger_char)
+                                end,
+                            },
+                        },
+                    }
+                    )
+                end -- if ok_git_fmt and ok_git_srt and ok_cmp_git
+            end     -- do
 
-            require('cmp_commit').setup({
-                set = true,
-                format = { "<<= ", " =>>" },
-                length = 9,
-                block = { "__pycache__", "CMakeFiles", "node_modules", "target" },
-                word_list = "~/cmpcommit.json",
-                repo_list = {
-                    { "Name of repo", "PATH/TO/FILE.json" }
-                }
-            })
+            -- Guard cmp_commit with pcall since it's optional
+            do
+                local ok_cmp_commit, cmp_commit = pcall(require, 'cmp_commit')
+                if ok_cmp_commit and cmp_commit and cmp_commit.setup then
+                    cmp_commit.setup({
+                        set = true,
+                        format = { "<<= ", " =>>" },
+                        length = 9,
+                        block = { "__pycache__", "CMakeFiles", "node_modules", "target" },
+                        word_list = "~/cmpcommit.json",
+                        repo_list = {
+                            { "Name of repo", "PATH/TO/FILE.json" }
+                        }
+                    })
+                end
+            end
 
-            require("gitmoji").setup({
-                { -- the values below are the defaults
-                    filetypes = { "gitcommit" },
-                    completion = {
-                        append_space = false,
-                        complete_as = "emoji",
-                    },
-                }
-            })
+            -- Guard gitmoji with pcall since it's optional
+            do
+                local ok_gitmoji, gitmoji = pcall(require, "gitmoji")
+                if ok_gitmoji and gitmoji and gitmoji.setup then
+                    gitmoji.setup({
+                        { -- the values below are the defaults
+                            filetypes = { "gitcommit" },
+                            completion = {
+                                append_space = false,
+                                complete_as = "emoji",
+                            },
+                        }
+                    })
+                end
+            end
 
             local compare = require('cmp.config.compare')
 
-            cmp.setup {
-                sorting = {
-                    priority_weight = 2,
-                    require("copilot_cmp.comparators").prioritize,
-                    comparators = {
-                        require('cmp_fuzzy_buffer.compare'),
-                        compare.offset,
-                        compare.exact,
-                        compare.score,
-                        compare.recently_used,
-                        compare.kind,
-                        compare.sort_text,
-                        compare.length,
-                        compare.order,
-                    }
-                },
+            -- Build sorting comparators with optional enhanced comparators
+            local sorting_comparators = {
+                compare.offset,
+                compare.exact,
+                compare.score,
+                compare.recently_used,
+                compare.kind,
+                compare.sort_text,
+                compare.length,
+                compare.order,
             }
 
-            do
-                local ok_cmp_ai, cmp_ai = pcall(require, 'cmp_ai.config')
-                if ok_cmp_ai and cmp_ai and cmp_ai.setup then
-                    cmp_ai:setup({
-                        max_lines = 1000,
-                        provider = 'OpenAI',
-                        provider_options = {
-                            model = 'gpt-4',
-                        },
-                        log_errors = true,
-                        max_timeout_seconds = 8,
-                        html = true,
-                        notify = true,
-                        notify_callback = function(msg)
-                            vim.notify(msg)
-                        end,
-                        run_on_every_keystroke = true,
-                        ignored_file_types = {
-                            -- default is not to ignore
-                            -- uncomment to ignore in lua:
-                            -- lua = true
-                        },
-                    })
-                end
+            -- Safely add fuzzy_buffer comparator if available
+            local ok_fuzzy, fuzzy_compare = pcall(require, 'cmp_fuzzy_buffer.compare')
+            if ok_fuzzy and fuzzy_compare then
+                table.insert(sorting_comparators, 1, fuzzy_compare)
             end
 
+            local sorting_setup = {
+                priority_weight = 2,
+                comparators = sorting_comparators,
+            }
 
-            do
-                local ok_tabnine, tabnine = pcall(require, 'cmp_tabnine.config')
-                if ok_tabnine and tabnine and tabnine.setup then
-                    tabnine:setup({
-                        max_lines = 1000,
-                        max_num_results = 20,
-                        sort = true,
-                        run_on_every_keystroke = true,
-                        snippet_placeholder = '..',
-                        ignored_file_types = {
-                            -- default is not to ignore
-                            -- uncomment to ignore in lua:
-                            -- lua = true
-                        },
-                        show_prediction_strength = false,
-                        min_percent = 0
-                    })
-                    local ok_tab_mod, tab_mod = pcall(require, 'cmp_tabnine')
-                    if ok_tab_mod and tab_mod and tab_mod.prefetch then
-                        pcall(tab_mod.prefetch, file_path)
-                    end
-                end
+            -- Safely add copilot comparator if available
+            local ok_copilot_cmp, copilot_comparators = pcall(require, "copilot_cmp.comparators")
+            if ok_copilot_cmp and copilot_comparators and copilot_comparators.prioritize then
+                sorting_setup.priority_weight = 2
+                sorting_setup.comparators = {
+                    copilot_comparators.prioritize,
+                    unpack(sorting_comparators),
+                }
             end
+
+            cmp.setup({
+                sorting = sorting_setup,
+            })
+
+            -- DEPRECATED: cmp-ai is no longer maintained; use copilot-cmp, codeium, or supermaven instead
+            -- do
+            --     local ok_cmp_ai, cmp_ai = pcall(require, 'cmp_ai.config')
+            --     if ok_cmp_ai and cmp_ai and cmp_ai.setup then
+            --         cmp_ai:setup({
+            --             max_lines = 1000,
+            --             provider = 'OpenAI',
+            --             provider_options = {
+            --                 model = 'gpt-4',
+            --             },
+            --             log_errors = true,
+            --             max_timeout_seconds = 8,
+            --             html = true,
+            --             notify = true,
+            --             notify_callback = function(msg)
+            --                 vim.notify(msg)
+            --             end,
+            --             run_on_every_keystroke = true,
+            --             ignored_file_types = {
+            --                 -- default is not to ignore
+            --                 -- uncomment to ignore in lua:
+            --                 -- lua = true
+            --             },
+            --         })
+            --     end
+            -- end
+
+
+            -- DEPRECATED: cmp-tabnine is abandoned; use copilot-cmp, codeium, or supermaven instead
+            -- do
+            --     local ok_tabnine, tabnine = pcall(require, 'cmp_tabnine.config')
+            --     if ok_tabnine and tabnine and tabnine.setup then
+            --         tabnine:setup({
+            --             max_lines = 1000,
+            --             max_num_results = 20,
+            --             sort = true,
+            --             run_on_every_keystroke = true,
+            --             snippet_placeholder = '..',
+            --             ignored_file_types = {
+            --                 -- default is not to ignore
+            --                 -- uncomment to ignore in lua:
+            --                 -- lua = true
+            --             },
+            --             show_prediction_strength = false,
+            --             min_percent = 0
+            --         })
+            --         local ok_tab_mod, tab_mod = pcall(require, 'cmp_tabnine')
+            --         if ok_tab_mod and tab_mod and tab_mod.prefetch then
+            --             pcall(tab_mod.prefetch, file_path)
+            --         end
+            --     end
+            -- end
 
             -- Copilot setup: disable inline suggestions/panel so copilot-cmp handles it
             do

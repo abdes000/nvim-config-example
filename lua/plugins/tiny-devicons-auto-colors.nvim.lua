@@ -5,10 +5,21 @@ return {
     },
     event = "VeryLazy",
     config = function()
-        -- You can add as many colors as you like. More colors is better to estimate the nearest color for each devicon.
-        local theme_colors = require("catppuccin.palettes").get_palette("macchiato")
+        -- Guard with pcall since catppuccin and tiny-devicons are optional
+        local ok_palette, catppuccin_palettes = pcall(require, "catppuccin.palettes")
+        if not ok_palette or not catppuccin_palettes then
+            return
+        end
 
-        require('tiny-devicons-auto-colors').setup({
+        local ok_colors, tiny_devicons = pcall(require, 'tiny-devicons-auto-colors')
+        if not ok_colors or not tiny_devicons then
+            return
+        end
+
+        -- You can add as many colors as you like. More colors is better to estimate the nearest color for each devicon.
+        local theme_colors = catppuccin_palettes.get_palette("macchiato")
+
+        tiny_devicons.setup({
             colors = theme_colors,
             ----or----
             --     colors = {
@@ -27,8 +38,8 @@ return {
             -- Adjusts factors to get a better color matching.
             factors = {
                 lightness = 1.75, -- Adjust the lightness factor.
-                chroma = 1, -- Adjust the chroma factor.
-                hue = 1.25, -- Adjust the hue factor.
+                chroma = 1,       -- Adjust the chroma factor.
+                hue = 1.25,       -- Adjust the hue factor.
             },
 
             -- Cache greatly improve the performance of the plugin. It saves all the matchings in a file.

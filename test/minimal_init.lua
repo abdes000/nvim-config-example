@@ -1,18 +1,22 @@
 vim.cmd [[set runtimepath=$VIMRUNTIME]]
-vim.cmd [[set packpath=/tmp/nvim/site]]
 
-local package_root = '/tmp/nvim/site/pack'
-local install_path = package_root .. '/packer/start/packer.nvim'
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  vim.fn.system {
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable",
+    lazypath,
+  }
+end
+vim.opt.rtp:prepend(lazypath)
 
 local function load_plugins()
-  require('packer').startup {
+  require("lazy").setup {
     {
-      'wbthomason/packer.nvim',
       'neovim/nvim-lspconfig',
-    },
-    config = {
-      package_root = package_root,
-      compile_path = install_path .. '/plugin/packer_compiled.lua',
     },
   }
 end
@@ -68,13 +72,15 @@ _G.load_config = function()
   print [[You can find your log at $HOME/.cache/nvim/lsp.log. Please paste in a github issue under a details tag as described in the issue template.]]
 end
 
-if vim.fn.isdirectory(install_path) == 0 then
-  vim.fn.system { 'git', 'clone', 'https://github.com/wbthomason/packer.nvim', install_path }
-  load_plugins()
-  require('packer').sync()
-  vim.cmd [[autocmd User PackerComplete ++once lua load_config()]]
-else
-  load_plugins()
-  require('packer').sync()
-  _G.load_config()
+if vim.fn.isdirectory(lazypath) == 0 then
+  vim.fn.system {
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable",
+    lazypath,
+  }
 end
+load_plugins()
+vim.cmd [[autocmd User LazyDone ++once lua load_config()]]

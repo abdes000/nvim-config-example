@@ -75,7 +75,7 @@ return {
             -- "tzachar/cmp-ai", -- DEPRECATED: No longer maintained
             -- "vappolinario/cmp-clippy", -- DEPRECATED: Abandoned project
             -- { "tzachar/cmp-tabnine", build = './install.sh', }, -- DEPRECATED: Use copilot-cmp or codeium instead
-            "hrsh7th/cmp-copilot",
+            -- "hrsh7th/cmp-copilot", -- DEPRECATED: Abandoned repo. Use zbirenbaum/copilot-cmp below instead.
             {
                 "zbirenbaum/copilot-cmp",
                 event = { "InsertEnter", "LspAttach" },
@@ -136,97 +136,57 @@ return {
                 formatting = {
                     fields = { "kind", "abbr", "menu" }, -- order of displayed fields
 
-                    format = { require('lspkind').cmp_format({
-                        mode = "symbol_text",
-                        maxwidth = 50,
-                        ellipsis_char = '...',
-                        show_labelDetails = true,
-                        symbol_map = {
-                            HF = "",
-                            OpenAI = "",
-                            Codestral = "",
-                            Bard = "",
-                        }
-                    })
-                    },
-                    {
-                        function(entry, vim_item)
-                            local highlights_info = require("colorful-menu").cmp_highlights(entry)
-
-                            -- highlight_info is nil means we are missing the ts parser, it's
-                            -- better to fallback to use default `vim_item.abbr`. What this plugin
-                            -- offers is two fields: `vim_item.abbr_hl_group` and `vim_item.abbr`.
-                            if highlights_info ~= nil then
-                                vim_item.abbr_hl_group = highlights_info.highlights
-                                vim_item.abbr = highlights_info.text
-                            end
-
-                            return vim_item
-                        end,
-                    },
-                    {
-                        function(entry, vim_item)
-                            -- Add nice icons for completion kinds
-                            local kind_icons = {
-                                Text = "",
-                                Method = "",
-                                Function = "",
-                                Constructor = "",
-                                Field = "",
-                                Variable = "",
-                                Class = "ﴯ",
-                                Interface = "",
-                                Module = "",
-                                Property = "ﰠ",
-                                Unit = "",
-                                Value = "",
-                                Enum = "",
-                                Keyword = "",
-                                Snippet = "",
-                                Color = "",
-                                File = "",
-                                Reference = "",
-                                Folder = "",
-                                EnumMember = "",
-                                Constant = "",
-                                Struct = "",
-                                Event = "",
-                                Operator = "",
-                                TypeParameter = "",
-                            }
-
-                            vim_item.kind = kind_icons[vim_item.kind] or vim_item.kind
-                            vim_item.menu = ({
-                                buffer = "[Buf]",
-                                nvim_lsp = "[LSP]",
-                                luasnip = "[Snip]",
-                                path = "[Path]",
-                            })[entry.source.name]
-
-                            return vim_item
-                        end,
-                    },
-                    {
-                        function(entry, vim_item)
-                            local kind = require("lspkind").cmp_format({
+                    -- format must be a single function, not a table.
+                    -- Previously broken: format was a list { lspkind.cmp_format(...) }
+                    -- and three anonymous { function ... } blocks were dead no-op entries.
+                    format = function(entry, vim_item)
+                        -- 1. Apply lspkind icons (symbol + text mode)
+                        local ok_lk, lspkind = pcall(require, "lspkind")
+                        if ok_lk then
+                            vim_item = lspkind.cmp_format({
                                 mode = "symbol_text",
-                            })(entry, vim.deepcopy(vim_item))
-                            local highlights_info = require("colorful-menu").cmp_highlights(entry)
+                                maxwidth = 50,
+                                ellipsis_char = "...",
+                                show_labelDetails = true,
+                                symbol_map = {
+                                    HF        = "ï§",
+                                    OpenAI    = "ï",
+                                    Codestral = "ï",
+                                    Bard      = "ï",
+                                },
+                            })(entry, vim_item)
+                        end
 
-                            -- highlight_info is nil means we are missing the ts parser, it's
-                            -- better to fallback to use default `vim_item.abbr`. What this plugin
-                            -- offers is two fields: `vim_item.abbr_hl_group` and `vim_item.abbr`.
+                        -- 2. Apply colorful-menu syntax highlights (optional; needs TS parser)
+                        local ok_cm, colorful_menu = pcall(require, "colorful-menu")
+                        if ok_cm then
+                            local highlights_info = colorful_menu.cmp_highlights(entry)
+                            -- nil = TS parser missing; fall back to default abbr
                             if highlights_info ~= nil then
                                 vim_item.abbr_hl_group = highlights_info.highlights
-                                vim_item.abbr = highlights_info.text
+                                vim_item.abbr          = highlights_info.text
                             end
-                            local strings = vim.split(kind.kind, "%s", { trimempty = true })
-                            vim_item.kind = " " .. (strings[1] or "") .. " "
-                            vim_item.menu = ""
+                        end
 
-                            return vim_item
-                        end,
-                    }
+                        -- 3. Append source label in the menu column
+                        local source_labels = {
+                            buffer     = "[Buf]",
+                            nvim_lsp   = "[LSP]",
+                            luasnip    = "[Snip]",
+                            vsnip      = "[Snip]",
+                            path       = "[Path]",
+                            calc       = "[Calc]",
+                            git        = "[Git]",
+                            copilot    = "[AI]",
+                            codeium    = "[AI]",
+                            supermaven = "[AI]",
+                            minuet     = "[AI]",
+                        }
+                        vim_item.menu = source_labels[entry.source.name]
+                            or ("[" .. entry.source.name .. "]")
+
+                        return vim_item
+                    end,
                 },
                 window = {
                     completion = cmp.config.window.bordered(),    -- adds borders to completion menu
@@ -269,7 +229,7 @@ return {
                     { name = 'color_names' },
                     { name = "nvim_lsp" },
                     { name = "vsnip" },
-                    { name = "cmp-luasnip-choice" },
+                    { name = "luasnip_choice" },    -- cmp-luasnip-choice registers as 'luasnip_choice'
                     { name = "conventionalcommits" },
                     { name = "commit" },
                     { name = "gitmoji" },
@@ -311,7 +271,7 @@ return {
                     },
                     { name = "zsh" },
                     { name = "copilot" },
-                    { name = "copilot_cmp" },
+                    -- { name = "copilot_cmp" }, -- WRONG: zbirenbaum/copilot-cmp registers as 'copilot' (line above)
                     { name = "codeium" },
                     { name = "supermaven" },
                     { name = "minuet-ai" },
@@ -340,12 +300,7 @@ return {
                 }),
             })
 
-            -- Cmdline completion
-            cmp.setup.cmdline({ "/", "?" }, {
-                mapping = cmp.mapping.preset.cmdline(),
-                sources = { { name = "buffer" } }
-            })
-            -- Cmdline completion
+            -- Cmdline completion for search
             cmp.setup.cmdline({ "/", "?" }, {
                 mapping = cmp.mapping.preset.cmdline(),
                 sources = { { name = "buffer" } },
@@ -386,9 +341,14 @@ return {
                 end
             end
 
-            require('cmp_luasnip_choice').setup({
-                auto_open = true, -- Automatically open nvim-cmp on choice node (default: true)
-            });
+            do
+                local ok_lc, cmp_lc = pcall(require, 'cmp_luasnip_choice')
+                if ok_lc and cmp_lc and cmp_lc.setup then
+                    cmp_lc.setup({
+                        auto_open = true, -- Automatically open nvim-cmp on choice node (default: true)
+                    })
+                end
+            end
 
             do
                 local ok, ult = pcall(require, "cmp_nvim_ultisnips")
@@ -403,16 +363,23 @@ return {
                 end
             end
 
-            require("cmp_dictionary").setup({
-                paths = { "/usr/share/dict/words" },
-                exact_length = 2,
-            })
+            do
+                local ok_dict, cmp_dictionary = pcall(require, "cmp_dictionary")
+                if ok_dict and cmp_dictionary and cmp_dictionary.setup then
+                    cmp_dictionary.setup({
+                        paths = { "/usr/share/dict/words" },
+                        exact_length = 2,
+                    })
+                end
+            end
 
 
-            local format = require("cmp_git.format")
-            local sort = require("cmp_git.sort")
-
-            require("cmp_git").setup({
+            do
+            local ok_git_fmt, format = pcall(require, "cmp_git.format")
+            local ok_git_srt, sort   = pcall(require, "cmp_git.sort")
+            local ok_cmp_git, cmp_git = pcall(require, "cmp_git")
+            if ok_git_fmt and ok_git_srt and ok_cmp_git and cmp_git.setup then
+            cmp_git.setup({
                 -- defaults
                 filetypes = { "gitcommit", "octo", "NeogitCommitMessage" },
                 remotes = { "upstream", "origin" }, -- in order of most to least prioritized
@@ -514,6 +481,8 @@ return {
                 },
             }
             )
+            end -- if ok_git_fmt and ok_git_srt and ok_cmp_git
+            end -- do
 
             require('cmp_commit').setup({
                 set = true,
@@ -607,14 +576,21 @@ return {
                 end
             end
 
-            require("copilot").setup({
-                suggestion = { enabled = false },
-                panel = { enabled = false },
-            })
+            -- Copilot setup: disable inline suggestions/panel so copilot-cmp handles it
+            do
+                local ok_copilot, copilot = pcall(require, "copilot")
+                if ok_copilot and copilot and copilot.setup then
+                    copilot.setup({
+                        suggestion = { enabled = false },
+                        panel = { enabled = false },
+                    })
+                end
+            end
 
 
             local has_words_before = function()
-                if vim.api.nvim_buf_get_option(0, "buftype") == "prompt" then return false end
+                -- vim.api.nvim_buf_get_option is deprecated since Neovim 0.10; use vim.bo instead
+                if vim.bo.buftype == "prompt" then return false end
                 local line, col = unpack(vim.api.nvim_win_get_cursor(0))
                 return col ~= 0 and vim.api.nvim_buf_get_text(0, line - 1, 0, line - 1, col, {})[1]:match("^%s*$") == nil
             end
@@ -638,7 +614,8 @@ return {
             -- Example servers (extend as needed)
             lspconfig.lua_ls.setup({ capabilities = capabilities })
             lspconfig.pyright.setup({ capabilities = capabilities })
-            lspconfig.tsserver.setup({ capabilities = capabilities })
+            -- tsserver was renamed to ts_ls in nvim-lspconfig; tsserver is now deprecated
+            lspconfig.ts_ls.setup({ capabilities = capabilities })
             lspconfig.gopls.setup({ capabilities = capabilities })
             lspconfig.rust_analyzer.setup({ capabilities = capabilities })
             lspconfig.html.setup({ capabilities = capabilities })
@@ -647,43 +624,48 @@ return {
             lspconfig.yamlls.setup({ capabilities = capabilities })
 
 
-            local handlers = require('nvim-autopairs.completion.handlers')
-
-            cmp.event:on(
-                'confirm_done',
-                cmp_autopairs.on_confirm_done({
-                    filetypes = {
-                        -- "*" is a alias to all filetypes
-                        ["*"] = {
-                            ["("] = {
-                                kind = {
-                                    cmp.lsp.CompletionItemKind.Function,
-                                    cmp.lsp.CompletionItemKind.Method,
+            -- nvim-autopairs integration: guard with pcall since it is an optional dependency
+            do
+                local ok_ap, cmp_autopairs = pcall(require, 'nvim-autopairs.completion.cmp')
+                local ok_handlers, handlers = pcall(require, 'nvim-autopairs.completion.handlers')
+                if ok_ap and cmp_autopairs and ok_handlers and handlers then
+                    cmp.event:on(
+                        'confirm_done',
+                        cmp_autopairs.on_confirm_done({
+                            filetypes = {
+                                -- "*" is a alias to all filetypes
+                                ["*"] = {
+                                    ["("] = {
+                                        kind = {
+                                            cmp.lsp.CompletionItemKind.Function,
+                                            cmp.lsp.CompletionItemKind.Method,
+                                        },
+                                        handler = handlers["*"]
+                                    }
                                 },
-                                handler = handlers["*"]
-                            }
-                        },
-                        lua = {
-                            ["("] = {
-                                kind = {
-                                    cmp.lsp.CompletionItemKind.Function,
-                                    cmp.lsp.CompletionItemKind.Method
+                                lua = {
+                                    ["("] = {
+                                        kind = {
+                                            cmp.lsp.CompletionItemKind.Function,
+                                            cmp.lsp.CompletionItemKind.Method
+                                        },
+                                        ---@param char string
+                                        ---@param item table item completion
+                                        ---@param bufnr number buffer number
+                                        ---@param rules table
+                                        ---@param commit_character table<string>
+                                        handler = function(char, item, bufnr, rules, commit_character)
+                                            -- Your handler function. Inspect with print(vim.inspect{char, item, bufnr, rules, commit_character})
+                                        end
+                                    }
                                 },
-                                ---@param char string
-                                ---@param item table item completion
-                                ---@param bufnr number buffer number
-                                ---@param rules table
-                                ---@param commit_character table<string>
-                                handler = function(char, item, bufnr, rules, commit_character)
-                                    -- Your handler function. Inspect with print(vim.inspect{char, item, bufnr, rules, commit_character})
-                                end
+                                -- Disable for tex
+                                tex = false
                             }
-                        },
-                        -- Disable for tex
-                        tex = false
-                    }
-                })
-            )
+                        })
+                    )
+                end
+            end
         end,
     },
 }

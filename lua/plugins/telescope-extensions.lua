@@ -2,23 +2,27 @@ return {
     "nvim-telescope/telescope.nvim",
     dependencies = {
         "nvim-lua/plenary.nvim",
+        "kkharji/sqlite.lua",  -- required by telescope-all-recent
 
         -- Core extensions
         { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+
+        -- Recency tracking (all-recent/frecency scoring)
+        "prochri/telescope-all-recent.nvim",  -- owner is prochri, NOT nvim-telescope
 
         -- Productivity
         "nvim-telescope/telescope-file-browser.nvim",
         "nvim-telescope/telescope-project.nvim",
         "nvim-telescope/telescope-recent-files.nvim",
         "nvim-telescope/telescope-frecency.nvim",
-        "nvim-telescope/telescope-session.nvim",
+        -- "nvim-telescope/telescope-session.nvim",  -- INVALID: does not exist under nvim-telescope org
         "nvim-telescope/telescope-undo.nvim",
         "nvim-telescope/telescope-command-palette.nvim",
         "nvim-telescope/telescope-tabs",
         "nvim-telescope/telescope-tele-tabby.nvim",
-        "nvim-telescope/telescope-windowizer.nvim",
-        "nvim-telescope/telescope-menu.nvim",
-        "nvim-telescope/telescope-tasks.nvim",
+        -- "nvim-telescope/telescope-windowizer.nvim", -- INVALID: no repo found under this name/org
+        -- "nvim-telescope/telescope-menu.nvim",       -- WRONG OWNER: use octarect/telescope-menu.nvim
+        -- "nvim-telescope/telescope-tasks.nvim",      -- WRONG OWNER: use lpoto/telescope-tasks.nvim
 
         -- Git
         "nvim-telescope/telescope-git-branch.nvim",
@@ -66,8 +70,8 @@ return {
         "nvim-telescope/telescope-z.nvim",
         "nvim-telescope/telescope-tmuxinator.nvim",
         "nvim-telescope/telescope-hop.nvim",
-        "nvim-telescope/telescope-docker.nvim",
-        "nvim-telescope/telescope-docker-commands",
+        -- "nvim-telescope/telescope-docker.nvim",          -- WRONG OWNER: use lpoto/telescope-docker.nvim
+        -- "nvim-telescope/telescope-docker-commands",      -- WRONG OWNER: use zigotica/telescope-docker-commands.nvim
         "nvim-telescope/telescope-openbrowser.nvim",
         "nvim-telescope/telescope-vim-bookmarks.nvim",
         "nvim-telescope/telescope-tmux.nvim",
@@ -76,13 +80,13 @@ return {
         "nvim-telescope/telescope-lazy.nvim",
         "nvim-telescope/telescope-lazy-plugins.nvim",
         "nvim-telescope/telescope-cscope.nvim",
-        "nvim-telescope/telescope-vimspector.nvim",
+        -- "nvim-telescope/telescope-vimspector.nvim",  -- DEPRECATED: vimspector is largely unmaintained for nvim
         "nvim-telescope/telescope-dap.nvim",
         -- "nvim-telescope/telescope-dapzzzz", -- INVALID: typo/unknown, commented out
-        "nvim-telescope/telescope-packer.nvim",
+        -- "nvim-telescope/telescope-packer.nvim",  -- DEPRECATED: packer.nvim is unmaintained; use lazy.nvim
         "nvim-telescope/telescope-asynctasks.nvim",
-        "nvim-telescope/telescope-ultisnips.nvim",
-        "nvim-telescope/telescope-coc.nvim",
+        -- "nvim-telescope/telescope-ultisnips.nvim", -- LEGACY: UltiSnips ecosystem; prefer LuaSnip + telescope-luasnip.nvim
+        -- "nvim-telescope/telescope-coc.nvim",        -- LEGACY: coc.nvim integration; prefer native LSP
         -- "nvim-telescope/telescope-resession.nvim", -- INVALID: likely misspelled 'resession', commented out
         "nvim-telescope/telescope-gpt.nvim",
         "nvim-telescope/telescope-cmdline.nvim",
@@ -94,7 +98,7 @@ return {
         "nvim-telescope/telescope-search-dir-picker.nvim",
         "nvim-telescope/telescope-directory.nvim",
         "nvim-telescope/dir-telescope.nvim",
-        "nvim-telescope/telescope-monorepos.nvim",
+        -- "nvim-telescope/telescope-monorepos.nvim",  -- INVALID: does not exist under this org; use imNel/monorepo.nvim
         "nvim-telescope/telescope-filelinks.nvim",
         "nvim-telescope/telescope-import.nvim",
         "nvim-telescope/telescope-picker-list.nvim",
@@ -107,41 +111,36 @@ return {
         "nvim-telescope/telescope-manix",
         "nvim-telescope/telescope-opds",
         "nvim-telescope/telescope-media-files.nvim",
-        "nvim-telescope/telescope-tele-tabby.nvim",
-        "nvim-telescope/telescope-tabs",
-        "nvim-telescope/telescope-undo.nvim",
-        "nvim-telescope/telescope-ctags-outline.nvim",
-        "nvim-telescope/telescope-terraform-doc.nvim",
-        "nvim-telescope/telescope-rails.nvim",
-        "nvim-telescope/telescope-texsuite",
-        "nvim-telescope/telescope-just.nvim",
-        "nvim-telescope/telescope-zotero.nvim",
-        "nvim-telescope/telescope-foldmarkers.nvim",
-        "nvim-telescope/telescope-jj.nvim",
-        "nvim-telescope/telescope-live-grep-args.nvim",
-        "nvim-telescope/telescope-rg.nvim",
-        "nvim-telescope/telescope-hierarchy.nvim",
     },
     config = function()
         local telescope = require("telescope")
         telescope.setup({})
 
-        -- Dynamically load all extensions
+        -- Dynamically load all extensions (pcall already used below; these must match installed plugins)
         local extensions = {
-            "fzf", "file_browser", "project", "recent_files", "frecency", "session",
-            "undo", "command_palette", "tabs", "tele_tabby", "windowizer", "menu",
+            "fzf", "file_browser", "project", "recent_files", "frecency",
+            "undo", "command_palette", "tabs", "tele_tabby",
             "git_branch", "git_grep", "git_selector", "gitmoji", "cc", "git_conflicts",
             "git_submodules", "git_diffs", "symbols", "emoji", "glyph", "color_names",
             "box_drawing", "heading", "ports", "http_codes", "lsp_handlers", "ctags_outline",
             "terraform_doc", "ros", "hoogle", "gott", "switch", "rails", "texsuite", "just",
             "zotero", "foldmarkers", "jj", "live_grep_args", "rg", "hierarchy", "github",
-            "ghq", "repo", "node_modules", "z", "tmuxinator", "hop", "docker", "docker_commands",
+            "ghq", "repo", "node_modules", "z", "tmuxinator", "hop",
+            -- "docker",          -- WRONG OWNER: install lpoto/telescope-docker.nvim and uncomment
+            -- "docker_commands", -- WRONG OWNER: install zigotica/telescope-docker-commands.nvim and uncomment
             "openbrowser", "vim_bookmarks", "tmux", "zoxide", "luasnip", "lazy", "lazy_plugins",
-            "cscope", "vimspector", "dap", -- "dapzzzz", -- INVALID: commented out
-            "packer", "asynctasks", "ultisnips", "coc",
+            "cscope",
+            -- "vimspector", -- DEPRECATED: vimspector is largely unmaintained
+            "dap",
+            -- "dapzzzz",  -- INVALID: commented out
+            -- "packer",   -- DEPRECATED: packer.nvim is unmaintained
+            "asynctasks",
+            -- "ultisnips", -- LEGACY: prefer telescope-luasnip.nvim
+            -- "coc",       -- LEGACY: prefer native LSP
             -- "resession", -- INVALID: commented out
             "gpt", "cmdline", "cmdline_word", "everything", "extension_maker",
-            "alternate", "search_dir_picker", "directory", "dir_telescope", "monorepos",
+            "alternate", "search_dir_picker", "directory", "dir_telescope",
+            -- "monorepos", -- INVALID: does not exist under nvim-telescope org
             "filelinks", "import", "picker_list", "cache", "find_exe", "changes", "scriptnames",
             "messages", "helpgrep", "manix", "opds"
         }
@@ -150,72 +149,73 @@ return {
             pcall(telescope.load_extension, ext)
         end
 
-        require 'telescope-all-recent'.setup {
-            database = {
-                folder = vim.fn.stdpath("data"),
-                file = "telescope-all-recent.sqlite3",
-                max_timestamps = 10,
-            },
-            debug = false,
-            scoring = {
-                recency_modifier = {                   -- also see telescope-frecency for these settings
-                    [1] = { age = 240, value = 100 },  -- past 4 hours
-                    [2] = { age = 1440, value = 80 },  -- past day
-                    [3] = { age = 4320, value = 60 },  -- past 3 days
-                    [4] = { age = 10080, value = 40 }, -- past week
-                    [5] = { age = 43200, value = 20 }, -- past month
-                    [6] = { age = 129600, value = 10 } -- past 90 days
-                },
-                -- how much the score of a recent item will be improved.
-                boost_factor = 0.0001
-            },
-            default = {
-                disable = true,    -- disable any unkown pickers (recommended)
-                use_cwd = true,    -- differentiate scoring for each picker based on cwd
-                sorting = 'recent' -- sorting: options: 'recent' and 'frecency'
-            },
-            pickers = {            -- allows you to overwrite the default settings for each picker
-                man_pages = {      -- enable man_pages picker. Disable cwd and use frecency sorting.
-                    disable = false,
-                    use_cwd = false,
-                    sorting = 'frecency',
-                },
-
-                -- change settings for a telescope extension.
-                -- To find out about extensions, you can use `print(vim.inspect(require'telescope'.extensions))`
-                ['extension_name#extension_method'] = {
-                    -- [...]
+        -- telescope-all-recent: frecency + recency scoring for all pickers (github.com/prochri/telescope-all-recent.nvim)
+        do
+            local ok, all_recent = pcall(require, 'telescope-all-recent')
+            if ok and all_recent then
+                all_recent.setup {
+                    database = {
+                        folder = vim.fn.stdpath("data"),
+                        file = "telescope-all-recent.sqlite3",
+                        max_timestamps = 10,
+                    },
+                    debug = false,
+                    scoring = {
+                        recency_modifier = {                   -- also see telescope-frecency for these settings
+                            [1] = { age = 240, value = 100 },  -- past 4 hours
+                            [2] = { age = 1440, value = 80 },  -- past day
+                            [3] = { age = 4320, value = 60 },  -- past 3 days
+                            [4] = { age = 10080, value = 40 }, -- past week
+                            [5] = { age = 43200, value = 20 }, -- past month
+                            [6] = { age = 129600, value = 10 } -- past 90 days
+                        },
+                        boost_factor = 0.0001
+                    },
+                    default = {
+                        disable = true,
+                        use_cwd = true,
+                        sorting = 'recent'
+                    },
+                    pickers = {
+                        man_pages = {
+                            disable = false,
+                            use_cwd = false,
+                            sorting = 'frecency',
+                        },
+                        ['extension_name#extension_method'] = {
+                            -- [...]
+                        }
+                    }
                 }
-            }
-        }
-        require("telescope").register_extension("echo")
-        local telescope = require('telescope')
-        telescope.setup {
-            extensions = {
-                doodle = {} -- Enable the doodle extension
-            }
-        }
-        -- Load the extension
-        telescope.load_extension('doodle')
+            end
+        end
+        -- Doodle extension (optional, guard with pcall)
+        do
+            local ok_doodle, telescope2 = pcall(require, 'telescope')
+            if ok_doodle then
+                telescope2.setup { extensions = { doodle = {} } }
+                local loaded = pcall(telescope2.load_extension, 'doodle')
+                if loaded then
+                    local keymap = vim.keymap.set
+                    keymap("n", "<space>dd", function()
+                        telescope2.extensions.doodle.find_notes()
+                    end, { desc = "Doodle Find Notes" })
+                    keymap("n", "<space>ff", function()
+                        telescope2.extensions.doodle.find_files()
+                    end, { desc = "Doodle Find Files" })
+                    keymap("n", "<space>dy", function()
+                        telescope2.extensions.doodle.find_templates()
+                    end, { desc = "Doodle Find Templates" })
+                end
+            end
+        end
 
-        -- Example keymaps for doodle's telescope pickers
-        local keymap = vim.keymap.set
-        keymap("n", "<space>dd", function()
-            telescope.extensions.doodle.find_notes()
-        end, { desc = "Doodle Find Notes" })
-
-        keymap("n", "<space>ff", function()
-            telescope.extensions.doodle.find_files()
-        end, { desc = "Doodle Find Files" })
-
-        keymap("n", "<space>dy", function()
-            telescope.extensions.doodle.find_templates()
-        end, { desc = "Doodle Find Templates" })
-
-        require("telescope").load_extension("package_info")
-        require("telescope").load_extension("lazygit")
-        require("telescope").load_extension("yank_history")
-        require("telescope").load_extension("undo")
+        -- Extra integrations (wrapped in pcall — these plugins may or may not be installed)
+        local tel = require("telescope")
+        pcall(tel.load_extension, "package_info")
+        pcall(tel.load_extension, "lazygit")
+        pcall(tel.load_extension, "yank_history")
+        pcall(tel.load_extension, "undo")
         -- =========================
         -- Keymaps (Grouped)
         -- =========================
@@ -275,21 +275,21 @@ return {
         map("n", "<leader>gn", ":Telescope node_modules list<CR>", { desc = "Node modules" })
         map("n", "<leader>gz", ":Telescope zoxide list<CR>", { desc = "Zoxide dirs" })
         map("n", "<leader>gt", ":Telescope tmux sessions<CR>", { desc = "Tmux sessions" })
-        map("n", "<leader>gd", ":Telescope docker containers<CR>", { desc = "Docker containers" })
-        map("n", "<leader>gD", ":Telescope docker_commands<CR>", { desc = "Docker commands" })
+        -- map("n", "<leader>gd", ":Telescope docker containers<CR>", { desc = "Docker containers" })   -- WRONG OWNER: install lpoto/telescope-docker.nvim first
+        -- map("n", "<leader>gD", ":Telescope docker_commands<CR>", { desc = "Docker commands" })       -- WRONG OWNER: install zigotica/telescope-docker-commands.nvim first
         map("n", "<leader>go", ":Telescope openbrowser<CR>", { desc = "Open browser bookmarks" })
         map("n", "<leader>gbm", ":Telescope vim_bookmarks<CR>", { desc = "Vim bookmarks" })
         map("n", "<leader>gl", ":Telescope luasnip<CR>", { desc = "LuaSnip snippets" })
         map("n", "<leader>gy", ":Telescope yank_history<CR>", { desc = "Yank history (neoclip)" })
-        map("n", "<leader>gp", ":Telescope packer<CR>", { desc = "Packer plugins" })
+        -- map("n", "<leader>gp", ":Telescope packer<CR>", { desc = "Packer plugins" })                -- DEPRECATED: packer.nvim is unmaintained
         map("n", "<leader>ga", ":Telescope asynctasks<CR>", { desc = "Async tasks" })
-        map("n", "<leader>gcoc", ":Telescope coc<CR>", { desc = "Coc.nvim integration" })
+        -- map("n", "<leader>gcoc", ":Telescope coc<CR>", { desc = "Coc.nvim integration" })           -- LEGACY: prefer native LSP
         -- map("n", "<leader>grs", ":Telescope resession<CR>", { desc = "Resession sessions" }) -- commented out: invalid extension
         map("n", "<leader>ggpt", ":Telescope gpt<CR>", { desc = "ChatGPT integration" })
         map("n", "<leader>gcs", ":Telescope cscope<CR>", { desc = "Cscope picker" })
         map("n", "<leader>gdap", ":Telescope dap<CR>", { desc = "DAP integration" })
         -- map("n", "<leader>gdzz", ":Telescope dapzzzz<CR>", { desc = "DAP configs" }) -- commented out: invalid extension
-        map("n", "<leader>gv", ":Telescope vimspector<CR>", { desc = "Vimspector integration" })
+        -- map("n", "<leader>gv", ":Telescope vimspector<CR>", { desc = "Vimspector integration" })   -- DEPRECATED: vimspector is largely unmaintained
         map("n", "<leader>glz", ":Telescope lazy<CR>", { desc = "Lazy plugins" })
         map("n", "<leader>glp", ":Telescope lazy_plugins<CR>", { desc = "Lazy plugin configs" })
         map("n", "<leader>gex", ":Telescope everything<CR>", { desc = "Everything integration" })
